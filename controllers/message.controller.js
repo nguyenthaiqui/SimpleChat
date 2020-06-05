@@ -12,11 +12,21 @@ async function sendMessage(req, res){
   await message.save((error)=> {
     if(error)
       res.status(500).json(handleError.internalError(error,500));
-    res.status(200).json({
-      code: 200,
-      message: "Send message successfully"
-    });
-  })
+  });
+  let temp = await Message.populate(message,'author');  
+  let response = {
+    _id: temp._id,
+    user: temp.author.full_name,
+    message: temp.message,
+    created_at: temp.created_at,
+    updated_at: temp.updated_at
+  }
+
+  io.emit('message', response);
+  res.status(200).json({
+    code: 200,
+    message: "Send message successfully"
+  });
 }
 async function getMessage(req, res){
   let message = await Message.find().populate('author','full_name');
