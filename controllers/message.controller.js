@@ -12,6 +12,7 @@ async function sendMessage(req, res){
   await message.save((error)=> {
     if(error)
       res.status(500).json(handleError.internalError(error,500));
+    io.emit('message', req.body);
     res.status(200).json({
       code: 200,
       message: "Send message successfully"
