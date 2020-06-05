@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link href="http://maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="/auth/style" />
+</head>
+
+<body>
+  <div id="logreg-forms">
+    <form class="form-signin">
+      <h1 class="h3 mb-3 font-weight-normal" style="text-align: center"> Sign in</h1>
+      <div class="social-login">
+        <button class="btn facebook-btn social-btn" type="button"><span><i class="fab fa-facebook-f"></i> Sign in with
+            Facebook</span> </button>
+        <button class="btn google-btn social-btn" type="button"><span><i class="fab fa-google-plus-g"></i> Sign in with
+            Google+</span> </button>
+      </div>
+      <p style="text-align:center"> OR </p>
+      <div class="input-group">
+        <input type="text" id="inputUsername" class="form-control" placeholder="Username" required="" autofocus="">
+      </div>
+
+      <div class="input-group">
+        <input type="password" id="inputPassword" class="form-control" placeholder="Password" required="" autocomplete="on">
+      </div>
+
+      <div class="input-group">
+        <button id="btn-signin" class="btn btn-md btn-rounded btn-block form-control submit" type="submit"><i
+            class="fas fa-sign-in-alt"></i> Sign in</button>
+      </div>
+
+      <a href="#" id="forgot_pswd">Forgot password?</a>
+      <hr>
+      <!-- <p>Don't have an account!</p>  -->
+      <button class="btn btn-primary btn-block" type="button" id="btn-signup-form"><i class="fas fa-user-plus"></i> Sign up
+        New Account</button>
+    </form>
+
+    <form action="#" class="form-reset">
+      <input type="email" id="resetEmail" class="form-control" placeholder="Email address" required="" autofocus="">
+      <button class="btn btn-primary btn-block" type="submit">Reset Password</button>
+      <a href="#" id="cancel_reset"><i class="fas fa-angle-left"></i> Back</a>
+    </form>
+
+    <form action="#" class="form-signup">
+      <div class="social-login">
+        <button class="btn facebook-btn social-btn" type="button"><span><i class="fab fa-facebook-f"></i> Sign up with
+            Facebook</span> </button>
+      </div>
+      <div class="social-login">
+        <button class="btn google-btn social-btn" type="button"><span><i class="fab fa-google-plus-g"></i> Sign up with
+            Google+</span> </button>
+      </div>
+
+      <p style="text-align:center">OR</p>
+
+      <input type="text" id="user-full-name" class="form-control" placeholder="Full name" required="" autofocus="">
+      <input type="username" id="user-username" class="form-control" placeholder="Username" required autofocus="">
+      <input type="password" id="user-pass" class="form-control" placeholder="Password" required autofocus="" autocomplete="on">
+      <input type="password" id="user-repeatpass" class="form-control" placeholder="Confirm Password" required
+        autofocus="" autocomplete="on"> 
+
+      <div class="input-group">
+        <button id="btn-signup" class="btn btn-md btn-block submit" type="submit"><i class="fas fa-user-plus"></i> Sign Up</button>
+      </div>
+
+      <a href="#" id="cancel_signup"><i class="fa fa-angle-left"></i> Back</a>
+    </form>
+    <br>
+
+  </div>
+  <script>
+    function toggleResetPswd(e) {
+      e.preventDefault();
+      $('#logreg-forms .form-signin').toggle() // display:block or none
+      $('#logreg-forms .form-reset').toggle() // display:block or none
+    }
+
+    function toggleSignUp(e) {
+      e.preventDefault();
+      $('#logreg-forms .form-signin').toggle(); // display:block or none
+      $('#logreg-forms .form-signup').toggle(); // display:block or none
+    }
+
+    function login(user){
+      let settings = {
+        url: "http://localhost:5000/auth/login",
+        type: "POST",
+        contentType: "application/json",
+        data: JSON.stringify(user),
+      };
+      $.ajax(settings)
+        .done(response => {
+          console.log('response: ',response.data);
+          localStorage.setItem('user', JSON.stringify(response.data));
+          window.location.replace('http://localhost:5000/');
+        })
+        .fail(response =>{
+          alert(response.responseJSON.message);
+          console.log(response.responseJSON)
+        });
+    }
+
+    function register(user){
+      let settings = {
+        url: "http://localhost:5000/auth/register",
+        type: "POST",
+        contentType: "application/json",
+        data: JSON.stringify(user),
+      };
+      $.ajax(settings)
+        .done(response => {
+          $('#logreg-forms .form-signin').toggle(); // display:block or none
+          $('#logreg-forms .form-signup').toggle(); // display:block or none
+        })
+        .fail(response =>{
+          console.log(response.responseJSON);
+          if(response.responseJSON.code == 400)
+            alert(response.responseJSON.message);
+        } );
+    }
+
+    $(() => {
+      // Login Register Form
+      $('#logreg-forms #forgot_pswd').click(toggleResetPswd);
+      $('#logreg-forms #cancel_reset').click(toggleResetPswd);
+      $('#logreg-forms #btn-signup-form').click(toggleSignUp);
+      $('#logreg-forms #cancel_signup').click(toggleSignUp);
+      $('#btn-signin').click(()=>{
+        event.preventDefault();
+        login({
+          username: $("#inputUsername").val(),
+          password: $("#inputPassword").val()
+        })
+      });
+      $('#btn-signup').click(()=>{
+        event.preventDefault();
+        register({
+          username: $("#user-username").val(),
+          password: $("#user-pass").val(),
+          full_name: $("#user-full-name").val()
+        })
+      })
+    })
+  </script>
+</body>
+
+</html>
