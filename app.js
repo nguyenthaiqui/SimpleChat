@@ -20,21 +20,6 @@ var Messages = mongoose.model('messages',{ name : String, message : String});
 app.use('/', indexRoute);
 app.use('/auth',  authentication_route);
 app.use('/conversation', conversation_route);
-app.get('/messages',  (req, res) => {
-  Messages.find({}, (err, messages) => {
-      res.send(messages); // trước mắt cứ show trước dạng json đã nhé
-  })
-})
-app.post('/messages', (req, res) => {
-  let message = new Messages(req.body);  // khởi tạo 1 đối tượng Messages 
-  // Tiến hành lưu dữ liệu vào mongo
-  message.save((err) => {
-      if(err) 
-        res.sendStatus(500);
-      io.emit('message', req.body);
-      res.sendStatus(200);
-  });
-});
 
 io.on('connection', () =>{ 
   console.log('Connecting');
