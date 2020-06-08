@@ -1,0 +1,24 @@
+.user-message{
+  display: flex;
+}
+.user-message-chat{
+  display:flex;
+  width: 100%;
+}
+.user-avatar{
+  background-image: url('https://img.icons8.com/plasticine/2x/user.png');
+  background-repeat: no-repeat;
+  width: 100px ;
+  height: 100px;
+  background-size: contain;
+  background-position: center;
+}
+.user-information h3{
+  color:#2e86de;
+}
+.user-comment h4{
+  font-weight:300;
+}
+.user-comment p{
+  font-style:italic;
+}

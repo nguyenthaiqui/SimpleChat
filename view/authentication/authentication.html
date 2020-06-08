@@ -75,6 +75,7 @@
 
   </div>
   <script>
+    var server = window.location.protocol + '//' + window.location.hostname + ':' + window.location.port+'/';
     function toggleResetPswd(e) {
       e.preventDefault();
       $('#logreg-forms .form-signin').toggle() // display:block or none
@@ -89,7 +90,7 @@
 
     function login(user){
       let settings = {
-        url: "http://localhost:5000/auth/login",
+        url: `${server}auth/login`,
         type: "POST",
         contentType: "application/json",
         data: JSON.stringify(user),
@@ -98,7 +99,7 @@
         .done(response => {
           console.log('response: ',response.data);
           localStorage.setItem('user', JSON.stringify(response.data));
-          window.location.replace('http://localhost:5000/');
+          window.location.replace(server);
         })
         .fail(response =>{
           alert(response.responseJSON.message);
@@ -108,7 +109,7 @@
 
     function register(user){
       let settings = {
-        url: "http://localhost:5000/auth/register",
+        url: `${server}auth/register`,
         type: "POST",
         contentType: "application/json",
         data: JSON.stringify(user),
