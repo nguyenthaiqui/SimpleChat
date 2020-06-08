@@ -27,10 +27,14 @@
     ></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
   </head>
+
   <body>
-    <div class="container">
+    <div class="container" style="display: flex;margin-top: 5%;">
       <br />
-      <div class="jumbotron" style="margin-bottom: 8%;">
+      <div
+        class="jumbotron"
+        style="margin-bottom: 8%; height: -webkit-fill-available;"
+      >
         <h1 class="display-4">Message App</h1>
         <br />
         <input id="name" class="form-control" placeholder="Họ tên" disabled />
@@ -43,8 +47,16 @@
         <br />
         <button id="send" class="btn btn-success">Gửi</button>
       </div>
-      <div id="messages" style="background-color: whitesmoke;
-      border-radius: 8px;"></div>
+      <div
+        id="messages"
+        style="
+          background-color: whitesmoke;
+          border-radius: 8px;
+          margin-left: 2%;
+          overflow-y: scroll;
+          height: 400px;
+        "
+      ></div>
     </div>
     <script>
       var socket = io();
@@ -95,7 +107,7 @@
         let created_at = message.created_at;
         let result = hanleTime(created_at);
         $('#messages').append(`
-      <div class="d-flex justify-content-start" style="display:block; padding:2% 2%;margin-top:-5%">
+      <div class="d-flex justify-content-start" style="display:block; padding:2% 2%;margin-top:2%">
         <h3 style="color:#2e86de"> ${message.user} </h3>
           <div style="text-align:start, display:block">
             <h4 style="font-weight:300;
