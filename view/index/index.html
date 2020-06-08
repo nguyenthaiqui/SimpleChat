@@ -26,15 +26,13 @@
       crossorigin="anonymous"
     ></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="/css" />
   </head>
-
   <body>
-    <div class="container" style="display: flex;margin-top: 5%;">
+    <div class="container" style="display: flex; margin-top: 2%;">
       <br />
-      <div
-        class="jumbotron"
-        style="margin-bottom: 8%; height: -webkit-fill-available;"
-      >
+      <div class="jumbotron">
         <h1 class="display-4">Message App</h1>
         <br />
         <input id="name" class="form-control" placeholder="Họ tên" disabled />
@@ -49,28 +47,30 @@
       </div>
       <div
         id="messages"
-        style="
-          background-color: whitesmoke;
-          border-radius: 8px;
-          margin-left: 2%;
-          overflow-y: scroll;
-          height: 400px;
-        "
+        style="height: 400px; overflow-y: scroll; margin-left: 2%;"
       ></div>
     </div>
     <script>
+      var server =
+        window.location.protocol +
+        '//' +
+        window.location.hostname +
+        ':' +
+        window.location.port +
+        '/';
       var socket = io();
       $(() => {
         let user = localStorage.getItem('user');
-        // if(!user){
-        //   alert('You must login first');
-        //   window.location.replace('http://localhost:5000/auth')
-        // }
+        if (!user) {
+          alert('You must login first');
+          window.location.replace(`${server}auth`);
+        }
         user = JSON.parse(user);
         $('#name').attr({
           placeholder: user.full_name,
           value: user.full_name,
         });
+
         $('#send').click(() => {
           sendMessage({
             user_id: user._id,
@@ -78,62 +78,61 @@
           });
           $('#message').val('');
         });
+
         getMessages();
         socket.on('message', addMessages);
       });
       function hanleTime(time) {
         let different_time = moment().diff(time, 'minutes');
-        let checkOverADay = different_time / 24 < 1;
+        let checkOverADay = different_time / (60 * 24) < 1;
         let result;
         if (!checkOverADay) {
-          different_time = Math.round(different_time / 24);
-          let day = different_time > 1 ? ' yesterday' : ' days ago';
-          result = different_time + day;
+          let different_day = Math.round(different_time / (24 * 60));
+          let day = different_day == 1 ? ' yesterday' : ' days ago';
+          result = different_day + day;
+        } else {
+          different_time = Math.round(different_time);
+          if (different_time < 60 && different_time >= 1) {
+            let time = different_time == 1 ? ' minute' : ' minutes';
+            result = different_time + time;
+          } else if (different_time < 1) result = 'less than 1 minutes';
+          else if (different_time > 60) {
+            different_time = Math.round(different_time / 60);
+            let time = different_time > 1 ? ' hours' : 'hour';
+            result = different_time + time;
+          }
+          result += ' ago';
         }
-        different_time = Math.round(different_time);
-        if (different_time < 60 && different_time >= 1) {
-          let time = different_time == 1 ? ' minute' : ' minutes';
-          result = different_time + time;
-        } else if (different_time < 1) result = 'less than 1 minutes';
-        else if (different_time > 60) {
-          different_time = Math.round(different_time / 60);
-          let time = different_time > 1 ? ' hours' : 'hour';
-          result = different_time + time;
-        }
-        result += ' ago';
         return result;
       }
       function addMessages(message) {
         let created_at = message.created_at;
-        let result = hanleTime(created_at);
-        $('#messages').append(`
-      <div class="d-flex justify-content-start" style="display:block; padding:2% 2%;margin-top:2%">
-        <h3 style="color:#2e86de"> ${message.user} </h3>
-          <div style="text-align:start, display:block">
-            <h4 style="font-weight:300;
-                    margin-top: auto;
-                    margin-bottom: auto;
-                    margin-left: 10px;
-                    border-radius: 25px;
-                    background-color: #82ccdd;
-                    padding: 10px;
-                    position: relative;">  
-          ${message.message} 
-          </h4>
-          <p style="font-style:italic"> ${result} </p>
+        let time_chat = hanleTime(created_at);
+        $('#messages').prepend(`
+        <div class='user-message'>
+          <div class='user-avatar'></div>
+          <div class='user-message-chat'>
+            <div class='user-information'>
+            <h5> ${message.user} </h5>
+            </div>
+            <div class='user-comment'>
+              <h4>  ${message.message} </h4>
+              <p> ${time_chat} </p>  
           </div>
-       </div>`);
+          </div>
+          
+        </div>`);
       }
 
       function getMessages() {
-        $.get('http://localhost:5000/conversation/message', (response) => {
+        $.get(`${server}conversation/message`, (response) => {
           let data = response.data;
           data.forEach(addMessages);
         });
       }
 
       function sendMessage(message) {
-        $.post('http://localhost:5000/conversation/message', message);
+        $.post(`${server}conversation/message`, message);
       }
     </script>
   </body>
